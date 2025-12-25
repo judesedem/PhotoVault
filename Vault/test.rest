@@ -1,0 +1,22 @@
+@base_url=127.0.0.1:8000
+@token=
+
+
+###Signup
+POST http://{{base_url}}/api/register/
+Content-Type: application/json
+
+{
+    "username":"Jude19",
+    "email":"judefiadzawoo@gmail.com",
+    "password":"jude123"
+}
+
+###Login
+POST http://{{base_url}}/api/login/
+Content-Type:application/json
+
+{
+    "username":"Jude19",
+    "password":"jude123"
+}
