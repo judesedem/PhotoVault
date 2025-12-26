@@ -12,6 +12,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
 
+from .serializers import MyTokenObtainPairSerializer
 
 
 class RegisterView(CreateAPIView):
@@ -20,7 +21,7 @@ class RegisterView(CreateAPIView):
     queryset=User.objects.all()
 
 class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class=TokenObtainPairView
+    serializer_class=MyTokenObtainPairSerializer
 
 
     

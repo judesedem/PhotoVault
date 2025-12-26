@@ -16,6 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+    #Remember to set a unique email.
     
 class LoginSerializer(serializers.ModelSerializer):
     username=serializers.CharField(max_length=120)
@@ -30,8 +31,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls,user):
         token=super().get_token(user)
 
-        token['name']=user.name
+        token['name']=user.username
         token['email']=user.email
         token['id']=user.id
 
         return token
+    
+
+# from django.core.serializers import serialize
+
+# serialize("json", User.objects.all(), cls=LazyEncoder)

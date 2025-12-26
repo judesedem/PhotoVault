@@ -29,7 +29,9 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -39,7 +41,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
-    "Vault"
+    "Vault",
+    "cloudinary",
+    "cloudinary_storage"
 ]
 AUTH_USER_MODEL='Vault.User'
 
@@ -141,3 +145,9 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1)   
 }
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/'
+CLOUDINARY_STORAGE = { 'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'), 
+                      'API_KEY': os.getenv('CLOUDINARY_API_KEY'), 
+                      'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'), }
