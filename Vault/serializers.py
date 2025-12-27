@@ -4,11 +4,22 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class UserSerializer(serializers.ModelSerializer):
     password=serializers.CharField(write_only=True)
+    email=serializers.EmailField()
 
     class Meta:
         model=User
         fields=('username','email','id','password')
-            
+
+    def validate_email(self,value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email exists") 
+        return value  
+    
+    def validate_user(self,value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username already exists")
+        return value
+    
     def create(self,validated_data):
         user=User.objects.create_user(
             username=validated_data['username'],
@@ -16,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
-    #Remember to set a unique email.
+   
     
 class LoginSerializer(serializers.ModelSerializer):
     username=serializers.CharField(max_length=120)
@@ -33,7 +44,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         token['name']=user.username
         token['email']=user.email
-        token['id']=user.id
+        token['id']=str(user.id)
 
         return token
     
