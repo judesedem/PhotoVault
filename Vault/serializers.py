@@ -2,22 +2,23 @@ from rest_framework import serializers
 from .models import User,PhotoVault
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-class UserSerializer(serializers.ModelSerializer):
+class SignupSerializer(serializers.ModelSerializer):
+    username=serializers.CharField()
     password=serializers.CharField(write_only=True)
     email=serializers.EmailField()
 
     class Meta:
-        model=User
+        model=User 
         fields=('username','email','id','password')
 
     def validate_email(self,value):
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("This email exists") 
+            raise serializers.ValidationError('This email already exists!') 
         return value  
     
-    def validate_user(self,value):
+    def validate_username(self,value):
         if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("Username already exists")
+            raise serializers.ValidationError('This username already exists')
         return value
     
     def create(self,validated_data):
@@ -52,7 +53,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 class PhotoSerializer(serializers.ModelSerializer):
-    uploaded_at=serializers.DateTimeField(write_only=True)
+    uploaded_at=serializers.DateTimeField(read_only=True)
+    username=serializers.CharField(source='user.username',read_only=True)
+
     class Meta:
         model=PhotoVault
         fields='__all__'
+        read_only_fields=['id','uploaded_at','username']
+        extra_kwargs={
+            'user':{'write_only':True}
+        }

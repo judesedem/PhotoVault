@@ -4,8 +4,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 from rest_framework import generics
-from .models import User
-from .serializers import UserSerializer,LoginSerializer,PhotoSerializer
+from .models import User,PhotoVault
+from .serializers import SignupSerializer,LoginSerializer,PhotoSerializer
 
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
@@ -20,7 +20,7 @@ from rest_framework.decorators import api_view
 
 
 class RegisterView(CreateAPIView):
-    serializer_class=UserSerializer
+    serializer_class=SignupSerializer
     permission_classes=[AllowAny]
     queryset=User.objects.all()
 
@@ -61,11 +61,61 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class=MyTokenObtainPairSerializer
 
 
-
+from rest_framework.permissions import IsAuthenticated
 class PhotoView(APIView):
+    permission_classes=[IsAuthenticated]
     def post(self,request):
         serializer=PhotoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self,request):
+        photos=PhotoVault.objects.filter(user=request.user)
+        serializer=PhotoSerializer(photos,many=True)
+        return Response(serializer.data)
+    
+class PhotoDetailView(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def get_object(self,pk):
+        try:
+            return PhotoVault.objects.get(pk=pk, user=self.request.user)
+        
+        except PhotoVault.DoesNotExist:
+            return None
+    
+    def get(self,request,pk):
+        photo=self.get_object(pk)
+        if not photo:
+            return Response(
+                {'error':'Photo not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer=PhotoSerializer(photo)
+        return Response(serializer.data)
+    
+    def put(self,request,pk):
+        photo=self.get_object(pk)
+        if not photo:
+            return Response({
+                'error':'Photo Not Found'
+            },status=status.HTTP_404_NOT_FOUND)
+        serializer=PhotoSerializer(photo,data=request.data,partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self,request,pk):
+        photo=self.get_object(pk)
+        if not photo:
+            return Response(
+                {'error':'Photo Not Found'},status=status.HTTP_404_NOT_FOUND
+            )
+        photo.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+          
