@@ -7,8 +7,8 @@ POST http://{{base_url}}/api/register/
 Content-Type: application/json
 
 {
-    "username":"Jude1",
-    "email":"judefiadzawoo@gmail.com",
+    "username":"Jude193",
+    "email":"judefiadzawoo391@gmail.com",
     "password":"jude1233"
 }
 
@@ -17,6 +17,6 @@ POST http://{{base_url}}/api/login/
 Content-Type:application/json
 
 {
-    "username":"Jude19",
-    "password":"jude123"
+    "username":"Jude193",
+    "password":"jude1233"
 }

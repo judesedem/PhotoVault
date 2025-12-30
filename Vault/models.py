@@ -17,12 +17,13 @@ from django.core.serializers.json import DjangoJSONEncoder
     
 
 class PhotoVault(models.Model):
-    user=models.ForeignKey('Vault.User',on_delete=models.CASCADE)
+    user=models.ForeignKey('Vault.User',on_delete=models.CASCADE,related_name='photos')
     title=models.CharField(max_length=120)
     description=models.TextField(null=True, blank=True)
     photo=models.ImageField(upload_to="Photos/")
-    Public=models.BooleanField(default=True)
-    
+    is_public=models.BooleanField(default=True)
+    uploaded_at=models.DateTimeField(auto_now_add=True)
+   
 
     def __str__(self):
         return self.title

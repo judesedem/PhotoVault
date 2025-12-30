@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User,PhotoVault
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class UserSerializer(serializers.ModelSerializer):
@@ -37,6 +37,9 @@ class LoginSerializer(serializers.ModelSerializer):
         model=User
         fields=['username','password']
 
+    
+
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls,user):
@@ -47,8 +50,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['id']=str(user.id)
 
         return token
-    
 
-# from django.core.serializers import serialize
-
-# serialize("json", User.objects.all(), cls=LazyEncoder)
+class PhotoSerializer(serializers.ModelSerializer):
+    uploaded_at=serializers.DateTimeField(write_only=True)
+    class Meta:
+        model=PhotoVault
+        fields='__all__'
