@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User,PhotoVault
+from .models import User,PhotoVault,Album
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -55,8 +55,22 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class PhotoSerializer(serializers.ModelSerializer):
     uploaded_at=serializers.DateTimeField(read_only=True)
     user=serializers.ReadOnlyField(source='user.username')
+    album=serializers.CharField()
+    
+    
 
     class Meta:
         model=PhotoVault
-        fields=('title','photo','description','user','uploaded_at','is_public')       
+        fields=('title','photo','description','album','user','uploaded_at','is_public','id') 
+
+    def create(self, validated_data): 
+        album= validated_data.pop('album')
+        album, _ = Album.objects.get_or_create(album=album) 
+        photo = PhotoVault.objects.create(album=album, **validated_data) 
+        return photo      
        
+class AlbumSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        Model=Album
+        fields='__all__'

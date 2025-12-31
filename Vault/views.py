@@ -123,4 +123,13 @@ class PhotoDetailView(APIView):
           
     def perform_create(self,serializer):
         serializer.save(user=self.request.user)
-        
+from rest_framework.decorators import api_view,permission_classes
+from django.shortcuts import get_list_or_404
+
+@api_view(['GET']) 
+@permission_classes([IsAuthenticated,IsOwnerorReadOnly])
+
+def all_public_photos(request):    
+    photo=get_list_or_404(PhotoVault,is_public=True)
+    serializer=PhotoSerializer(photo,many=True)
+    return Response(serializer.data)
