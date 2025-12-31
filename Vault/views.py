@@ -39,6 +39,7 @@ class LoginView(APIView):
                 refresh = RefreshToken.for_user(user)
                 
                 return Response({
+                    'message':'Login Successful',
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
 
@@ -62,12 +63,13 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerorReadOnly
 class PhotoView(APIView):
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
     def post(self,request):
         serializer=PhotoSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -77,7 +79,7 @@ class PhotoView(APIView):
         return Response(serializer.data)
     
 class PhotoDetailView(APIView):
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
 
     def get_object(self,pk):
         try:
@@ -119,3 +121,6 @@ class PhotoDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
           
+    def perform_create(self,serializer):
+        serializer.save(user=self.request.user)
+        

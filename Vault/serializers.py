@@ -54,12 +54,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class PhotoSerializer(serializers.ModelSerializer):
     uploaded_at=serializers.DateTimeField(read_only=True)
-    username=serializers.CharField(source='user.username',read_only=True)
+    user=serializers.ReadOnlyField(source='user.username')
 
     class Meta:
         model=PhotoVault
-        fields='__all__'
-        read_only_fields=['id','uploaded_at','username']
-        extra_kwargs={
-            'user':{'write_only':True}
-        }
+        fields=('title','photo','description','user','uploaded_at','is_public')       
+       
