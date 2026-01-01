@@ -8,7 +8,7 @@ class User(AbstractUser):
     email=models.EmailField(unique=True)
     
 class Album(models.Model):
-    album=models.CharField(max_length=120,blank=True,null=True)
+    album=models.CharField(max_length=120,default='unknown')
     
 class PhotoVault(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name='photos')
@@ -17,7 +17,7 @@ class PhotoVault(models.Model):
     photo=models.ImageField(upload_to="Photos/",storage=MediaCloudinaryStorage())
     is_public=models.BooleanField(default=True)
     uploaded_at=models.DateTimeField(auto_now_add=True)
-    album=models.ForeignKey(Album,on_delete=models.CASCADE,null=True,blank=True)
+    album=models.ForeignKey(Album,on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
