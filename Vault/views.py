@@ -143,10 +143,11 @@ from django.shortcuts import get_list_or_404
 
 @api_view(['GET']) 
 @permission_classes([IsAuthenticated,IsOwnerorReadOnly])
-@method_decorator(cache_page(60 * 60 * 2))
-@method_decorator(vary_on_headers("Authorization"))
+@cache_page(60 * 15)
 
 def all_public_photos(request):    
     photo=get_list_or_404(PhotoVault,is_public=True)
-    serializer=PhotoSerializer(photo,many=True)
-    return Response(serializer.data)
+    serializer=PhotoSerializer(photo,many=True)   
+    response = Response(serializer.data) 
+    vary_on_headers(response, ["Authorization"])
+    return response
