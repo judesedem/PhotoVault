@@ -1,3 +1,14 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import viewsets
+
+
+
+
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -65,6 +76,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerorReadOnly
 class PhotoView(APIView):
+     
     permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
     def post(self,request):
         serializer=PhotoSerializer(data=request.data)
@@ -73,6 +85,8 @@ class PhotoView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @method_decorator(cache_page(60 * 60 * 2))
+    @method_decorator(vary_on_headers("Authorization"))
     def get(self,request):
         photos=PhotoVault.objects.filter(user=request.user)
         serializer=PhotoSerializer(photos,many=True)
@@ -87,7 +101,8 @@ class PhotoDetailView(APIView):
         
         except PhotoVault.DoesNotExist:
             return None
-    
+    @method_decorator(cache_page(60 * 60 * 2))
+    @method_decorator(vary_on_headers("Authorization"))
     def get(self,request,pk):
         photo=self.get_object(pk)
         if not photo:
@@ -128,6 +143,8 @@ from django.shortcuts import get_list_or_404
 
 @api_view(['GET']) 
 @permission_classes([IsAuthenticated,IsOwnerorReadOnly])
+@method_decorator(cache_page(60 * 60 * 2))
+@method_decorator(vary_on_headers("Authorization"))
 
 def all_public_photos(request):    
     photo=get_list_or_404(PhotoVault,is_public=True)

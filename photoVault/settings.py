@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "Vault",
     "cloudinary",
-    "cloudinary_storage"
+    "cloudinary_storage",
+    "django_redis"
 ]
 AUTH_USER_MODEL='Vault.User'
 
@@ -54,7 +55,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware"    
 ]
 
 ROOT_URLCONF = "photoVault.urls"
@@ -153,3 +154,14 @@ MEDIA_URL = '/media/'
 CLOUDINARY_STORAGE = { 'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'), 
                       'API_KEY': os.getenv('CLOUDINARY_API_KEY'), 
                       'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'), }
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
