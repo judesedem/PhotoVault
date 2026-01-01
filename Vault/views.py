@@ -6,6 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
 
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
+from rest_framework.views import APIView
 
 
 
@@ -88,6 +91,7 @@ class PhotoView(APIView):
     @method_decorator(cache_page(60 * 60 * 2))
     @method_decorator(vary_on_headers("Authorization"))
     def get(self,request):
+        throttle_classes = [UserRateThrottle]
         photos=PhotoVault.objects.filter(user=request.user)
         serializer=PhotoSerializer(photos,many=True)
         return Response(serializer.data)
