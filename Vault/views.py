@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 
 
 from .throttle import PhotoRequestThrottle
+from rest_framework_simplejwt import authentication
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -148,8 +149,8 @@ class PhotoDetailView(APIView):
 from django.shortcuts import get_list_or_404
 
 class AllPublicPhotosView(APIView):
-    permission_classes = [IsAuthenticated, IsOwnerorReadOnly]
-    throttle_classes = [PhotoRequestThrottle] 
+    permission_classes = [IsAuthenticated, IsOwnerorReadOnly]   
+    throttle_scope='photo'
     
     @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_headers('Authorization'))
@@ -157,3 +158,4 @@ class AllPublicPhotosView(APIView):
         photo = get_list_or_404(PhotoVault, is_public=True)
         serializer = PhotoSerializer(photo, many=True)
         return Response(serializer.data)
+    
