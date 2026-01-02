@@ -11,7 +11,7 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 
 
-
+from .throttle import PhotoRequestThrottle
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -79,6 +79,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerorReadOnly
 class PhotoView(APIView):
+    throttle_classes=[PhotoRequestThrottle]
      
     permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
     def post(self,request):
@@ -98,6 +99,7 @@ class PhotoView(APIView):
     
 class PhotoDetailView(APIView):
     permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
+    throttle_classes=[PhotoRequestThrottle]
 
     def get_object(self,pk):
         try:
@@ -142,17 +144,16 @@ class PhotoDetailView(APIView):
           
     def perform_create(self,serializer):
         serializer.save(user=self.request.user)
-from rest_framework.decorators import api_view,permission_classes
+
 from django.shortcuts import get_list_or_404
 
-@api_view(['GET']) 
-@permission_classes([IsAuthenticated,IsOwnerorReadOnly])
-@cache_page(60 * 15)
-
-def all_public_photos(request):    
-    photo=get_list_or_404(PhotoVault,is_public=True)
-    serializer=PhotoSerializer(photo,many=True)   
-    response = Response(serializer.data) 
-    vary_on_headers(response, ["Authorization"])
-    return response
-
+class AllPublicPhotosView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerorReadOnly]
+    throttle_classes = [PhotoRequestThrottle] 
+    
+    @method_decorator(cache_page(60 * 15))
+    @method_decorator(vary_on_headers('Authorization'))
+    def get(self, request):
+        photo = get_list_or_404(PhotoVault, is_public=True)
+        serializer = PhotoSerializer(photo, many=True)
+        return Response(serializer.data)
