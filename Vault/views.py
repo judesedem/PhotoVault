@@ -155,3 +155,4 @@ def all_public_photos(request):
     response = Response(serializer.data) 
     vary_on_headers(response, ["Authorization"])
     return response
+
