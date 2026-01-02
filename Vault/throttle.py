@@ -29,4 +29,4 @@ class PhotoRequestThrottle(throttling.BaseThrottle):
     
     def wait(self):
        
-        return None
+        return 15
