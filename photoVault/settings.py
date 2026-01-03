@@ -44,8 +44,11 @@ INSTALLED_APPS = [
     "Vault",
     "cloudinary",
     "cloudinary_storage",
-    "django_redis"
+    "django_redis",
+    "rest_framework_simplejwt.token_blacklist" 
 ]
+
+
 AUTH_USER_MODEL='Vault.User'
 
 MIDDLEWARE = [
