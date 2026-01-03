@@ -8,6 +8,7 @@ class User(AbstractUser):
     email=models.EmailField(unique=True)
     
 class Album(models.Model):
+    
     album=models.CharField(max_length=120,default='unknown')
     
 class PhotoVault(models.Model):

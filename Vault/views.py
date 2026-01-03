@@ -140,9 +140,9 @@ class PhotoDetailView(APIView):
                 {'error':'Photo Not Found'},status=status.HTTP_404_NOT_FOUND
             )
         photo.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'message':'Successfully Deleted'},status=status.HTTP_204_NO_CONTENT)
 
-          
+          #add functionality for deleting all photos at once
     def perform_create(self,serializer):
         serializer.save(user=self.request.user)
 
@@ -159,3 +159,14 @@ class AllPublicPhotosView(APIView):
         serializer = PhotoSerializer(photo, many=True)
         return Response(serializer.data)
     
+class AllPrivatePhotosView(APIView):
+    permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
+    throttle_scope='photo'
+    
+    @method_decorator(cache_page(60 * 15))
+    @method_decorator(vary_on_headers('Authorization'))
+    
+    def get(self,request):
+        photo=get_list_or_404(PhotoVault, is_public=False)
+        serializer=PhotoSerializer(photo,many=True)
+        return Response(serializer.data)
