@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
-from .views import RegisterView,LoginView,PhotoView,PhotoDetailView,AllPublicPhotosView,AllPrivatePhotosView,LogoutView
+from .views import RegisterView,LoginView,PhotoView,PhotoDetailView,AllPublicPhotosView,AllPrivatePhotosView,LogoutView,All_usersView
 from .import views
 urlpatterns=[   
     path('token/',TokenObtainPairView.as_view()),
@@ -11,5 +11,7 @@ urlpatterns=[
     path('photo/',PhotoView.as_view()),
     path('photo/<int:pk>/',PhotoDetailView.as_view()),
     path('all_public_photos/',AllPublicPhotosView.as_view()),
-    path('all_private_photos',AllPrivatePhotosView.as_view())
+    path('all_private_photos',AllPrivatePhotosView.as_view()),
+    path('allusers',All_usersView.as_view())
+
 ]

@@ -20,7 +20,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from rest_framework import generics
 from .models import User,PhotoVault
-from .serializers import SignupSerializer,LoginSerializer,PhotoSerializer
+from .serializers import SignupSerializer,LoginSerializer,PhotoSerializer,UserSerializer
 
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
@@ -33,7 +33,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from django.shortcuts import get_list_or_404
 
 
@@ -202,3 +202,10 @@ class AllPrivatePhotosView(APIView):
         serializer=PhotoSerializer(photo,many=True)
         return Response(serializer.data)
     
+class All_usersView(APIView):
+    permission_classes=[IsAdminUser]
+
+    def get(self,request):
+        user=User.objects.all()
+        serializer=UserSerializer(user,many=True)
+        return Response(serializer.data)

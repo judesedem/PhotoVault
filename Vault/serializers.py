@@ -2,6 +2,14 @@ from rest_framework import serializers
 from .models import User,PhotoVault,Album
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+
+class UserSerializer(serializers.ModelSerializer):
+    username=serializers.CharField()
+    email=serializers.CharField()
+
+    class Meta:
+        model=User
+        fields=('username',"email",'id')
 class SignupSerializer(serializers.ModelSerializer):
     username=serializers.CharField()
     password=serializers.CharField(write_only=True)
