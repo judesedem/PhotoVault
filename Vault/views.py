@@ -110,11 +110,11 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsOwnerorReadOnly
+from .permissions import IsOwnerorReadOnly,IsAuthenticatedorOwner
 class PhotoView(APIView):
     throttle_classes=[PhotoRequestThrottle]
      
-    permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
+    permission_classes=[IsAuthenticated,IsOwnerorReadOnly,IsAuthenticatedorOwner]
     def post(self,request):
         serializer=PhotoSerializer(data=request.data)
         if serializer.is_valid():
@@ -131,7 +131,7 @@ class PhotoView(APIView):
         return Response(serializer.data)
     
 class PhotoDetailView(APIView):
-    permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
+    permission_classes=[IsOwnerorReadOnly]
     throttle_classes=[PhotoRequestThrottle]
 
     def get_object(self,pk):
@@ -174,19 +174,19 @@ class PhotoDetailView(APIView):
         photo.delete()
         return Response({'message':'Successfully Deleted'},status=status.HTTP_204_NO_CONTENT)
 
-          #add functionality for deleting all photos at once
+       
     def perform_create(self,serializer):
         serializer.save(user=self.request.user)
 
 
 class AllPublicPhotosView(APIView):
-    permission_classes = [IsAuthenticated, IsOwnerorReadOnly]   
+    permission_classes = [IsAuthenticated]   
     throttle_scope='photo'
     
     @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_headers('Authorization'))
     def get(self, request):
-        photo = get_list_or_404(PhotoVault, is_public=True)
+        photo = get_list_or_404(PhotoVault, is_public=False)
         serializer = PhotoSerializer(photo, many=True)
         return Response(serializer.data)
     
@@ -202,7 +202,7 @@ class AllPrivatePhotosView(APIView):
         serializer=PhotoSerializer(photo,many=True)
         return Response(serializer.data)
     
-class All_usersView(APIView):
+class AllUsersView(APIView):
     permission_classes=[IsAdminUser]
 
     def get(self,request):
