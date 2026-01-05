@@ -186,10 +186,10 @@ class AllPublicPhotosView(APIView):
     @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_headers('Authorization'))
     def get(self, request):
-        photo=PhotoVault.objects.filter(is_public=True,owner=request.user)
+        photo=PhotoVault.objects.filter(is_public=True,user=request.user)
         if not photo.exists():
             return Response({'detail':'You have no public photos'},status=status.HTTP_404_NOT_FOUND)
-        serializer=PhotoSerializer
+        serializer=PhotoSerializer(photo,many=True)
         return Response(serializer.data)
             
     
