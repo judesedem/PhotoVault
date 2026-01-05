@@ -186,22 +186,35 @@ class AllPublicPhotosView(APIView):
     @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_headers('Authorization'))
     def get(self, request):
-        photo = get_list_or_404(PhotoVault, is_public=False)
-        serializer = PhotoSerializer(photo, many=True)
+        photo=PhotoVault.objects.filter(is_public=True,owner=request.user)
+        if not photo.exists():
+            return Response({'detail':'You have no public photos'},status=status.HTTP_404_NOT_FOUND)
+        serializer=PhotoSerializer
         return Response(serializer.data)
+            
     
 class AllPrivatePhotosView(APIView):
-    permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
-    throttle_scope='photo'
+    permission_classes = [IsAuthenticated]
+    throttle_scope = 'photo'
     
     @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_headers('Authorization'))
-    
-    def get(self,request):
-        photo=get_list_or_404(PhotoVault, is_public=False)
-        serializer=PhotoSerializer(photo,many=True)
+    def get(self, request):
+        
+        photos = PhotoVault.objects.filter(
+            is_public=False,
+            user=request.user
+        )
+        
+        
+        if not photos.exists():
+            return Response(
+                {"detail": "You have no private photos."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        serializer = PhotoSerializer(photos, many=True)
         return Response(serializer.data)
-    
 class AllUsersView(APIView):
     permission_classes=[IsAdminUser]
 
