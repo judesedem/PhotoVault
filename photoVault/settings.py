@@ -144,12 +144,12 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': [
     'rest_framework.throttling.AnonRateThrottle',
     'rest_framework.throttling.UserRateThrottle',
-    'Vault.throttle.PhotoRequestThrottle'
+    'rest_framework.throttling.ScopedRateThrottle'
 ],
 'DEFAULT_THROTTLE_RATES': {
     'anon': '100/day',
-    'user': '5/day',
-    'photo':'5/minute'
+    'photo':'5/minute',
+    'user':'1/minute'
 }
 
 

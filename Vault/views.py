@@ -43,7 +43,7 @@ class RegisterView(CreateAPIView):
     queryset=User.objects.all()
 
 
-class LoginView(APIView):
+class LoginView(APIView):    
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         
@@ -110,11 +110,9 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsOwnerorReadOnly,IsAuthenticatedorOwner
-class PhotoView(APIView):
-    throttle_classes=[PhotoRequestThrottle]
-     
-    permission_classes=[IsAuthenticated,IsOwnerorReadOnly,IsAuthenticatedorOwner]
+from .permissions import IsOwnerorReadOnly
+class PhotoView(APIView):     
+    permission_classes=[IsOwnerorReadOnly]
     def post(self,request):
         serializer=PhotoSerializer(data=request.data)
         if serializer.is_valid():
@@ -122,17 +120,16 @@ class PhotoView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    @method_decorator(cache_page(60 * 60 * 2))
+    @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_headers("Authorization"))
     def get(self,request):
-        throttle_classes = [UserRateThrottle]
         photos=PhotoVault.objects.filter(user=request.user)
         serializer=PhotoSerializer(photos,many=True)
         return Response(serializer.data)
     
 class PhotoDetailView(APIView):
     permission_classes=[IsOwnerorReadOnly]
-    throttle_classes=[PhotoRequestThrottle]
+    throttle_scope='photo'
 
     def get_object(self,pk):
         try:
@@ -186,12 +183,25 @@ class AllPublicPhotosView(APIView):
     @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_headers('Authorization'))
     def get(self, request):
+        photo=PhotoVault.objects.filter(is_public=True)
+        if not photo.exists():
+            return Response({'detail':'No public photos available'},status=status.HTTP_404_NOT_FOUND)
+        serializer=PhotoSerializer(photo,many=True)
+        return Response(serializer.data)
+            
+
+class MyPublicPhotosView(APIView):
+    permission_classes = [IsAuthenticated]   
+    throttle_scope='photo'
+    
+    @method_decorator(cache_page(60 * 15))
+    @method_decorator(vary_on_headers('Authorization'))
+    def get(self, request):
         photo=PhotoVault.objects.filter(is_public=True,user=request.user)
         if not photo.exists():
             return Response({'detail':'You have no public photos'},status=status.HTTP_404_NOT_FOUND)
         serializer=PhotoSerializer(photo,many=True)
         return Response(serializer.data)
-            
     
 class AllPrivatePhotosView(APIView):
     permission_classes = [IsAuthenticated]
