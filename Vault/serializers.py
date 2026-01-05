@@ -62,9 +62,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class PhotoSerializer(serializers.ModelSerializer):
     uploaded_at=serializers.DateTimeField(read_only=True)
-    user=serializers.CharField()
+    user=serializers.ReadOnlyField(source='user.username')
     album=serializers.CharField(write_only=True)
-   
+    
     
     
 

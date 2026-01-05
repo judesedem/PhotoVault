@@ -112,7 +112,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerorReadOnly
 class PhotoView(APIView):     
-    permission_classes=[IsOwnerorReadOnly]
+    permission_classes=[IsAuthenticated,IsOwnerorReadOnly]
     def post(self,request):
         serializer=PhotoSerializer(data=request.data)
         if serializer.is_valid():

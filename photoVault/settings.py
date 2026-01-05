@@ -149,7 +149,7 @@ REST_FRAMEWORK = {
 'DEFAULT_THROTTLE_RATES': {
     'anon': '100/day',
     'photo':'5/minute',
-    'user':'1/minute'
+    'user':'5/minute'
 }
 
 
