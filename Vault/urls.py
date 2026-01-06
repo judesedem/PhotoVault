@@ -12,6 +12,6 @@ urlpatterns=[
     path('photo/<int:pk>/',PhotoDetailView.as_view()),
     path('all_public_photos/',AllPublicPhotosView.as_view()),
     path('all_private_photos/',AllPrivatePhotosView.as_view()),
-    path('allusers',AllUsersView.as_view())
+    path('allusers/',AllUsersView.as_view())
 
 ]

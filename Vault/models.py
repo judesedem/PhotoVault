@@ -7,8 +7,7 @@ class User(AbstractUser):
     id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email=models.EmailField(unique=True)
     
-class Album(models.Model):
-    
+class Album(models.Model):    
     album=models.CharField(max_length=120,default='unknown')
     
 class PhotoVault(models.Model):
