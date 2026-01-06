@@ -232,3 +232,4 @@ class AllUsersView(APIView):
         user=User.objects.all()
         serializer=UserSerializer(user,many=True)
         return Response(serializer.data)
+    
