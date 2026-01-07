@@ -6,7 +6,12 @@ from cloudinary_storage.storage import MediaCloudinaryStorage
 class User(AbstractUser):
     id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email=models.EmailField(unique=True)
-    
+    CHOICES=[
+         ( "User","User"),
+        ("Admin","Admin"),
+    ]
+    role=models.CharField(max_length=20,choices=CHOICES,default='User')
+
 class Album(models.Model):    
     album=models.CharField(max_length=120,default='unknown')
     

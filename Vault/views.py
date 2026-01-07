@@ -66,7 +66,9 @@ class LoginView(APIView):
                     'user': {
                         'id': str(user.id),  
                         'email': user.email,
-                        'username': user.username
+                        'username': user.username,
+                        'role':user.role
+                        
                     }
                 }, status=status.HTTP_200_OK)
             
@@ -189,7 +191,9 @@ class AllPublicPhotosView(APIView):
         serializer=PhotoSerializer(photo,many=True)
         return Response(serializer.data)
             
-
+#JUDE1
+#judesedem@gmail.com
+#admin1
 class MyPublicPhotosView(APIView):
     permission_classes = [IsAuthenticated]   
     throttle_scope='photo'

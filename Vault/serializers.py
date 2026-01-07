@@ -17,7 +17,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=User 
-        fields=('username','email','id','password')
+        fields=('username','email','id','password','role')
 
     def validate_email(self,value):
         if User.objects.filter(email=value).exists():
@@ -27,6 +27,11 @@ class SignupSerializer(serializers.ModelSerializer):
     def validate_username(self,value):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError('This username already exists')
+        return value
+    
+    def validate_role(self,value):
+        if User.objects.filter(role=value,is_staff=True).exists():
+            return "Admin"
         return value
     
     def create(self,validated_data):
