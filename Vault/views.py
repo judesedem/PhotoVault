@@ -237,3 +237,99 @@ class AllUsersView(APIView):
         serializer=UserSerializer(user,many=True)
         return Response(serializer.data)
     
+from Auth_app.serializers import LoginSerializer,SignupSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.views import APIView
+from rest_framework.authentication import authenticate
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from Auth_app.models import User
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.exceptions import TokenError
+
+class SignupView(CreateAPIView):
+    serializer_class=SignupSerializer
+    permission_classes=[AllowAny]
+    queryset=User.objects.all()
+
+class LoginView(APIView):
+    def post(self,request):
+        serializer=LoginSerializer(data=request.data)
+
+        if serializer.is_valid():
+            username=serializer.validated_data['username']
+            password=serializer.validated_data['password']
+
+            user=authenticate(username=username, password=password)
+
+            if user:
+                refresh=RefreshToken.for_user(user)
+                return Response({
+                    'message':'Login Successful!',
+                    'refresh':str(refresh),
+                    'access':str(refresh.access_token),
+                    'username':user.username,
+                    'email':user.email,
+                    'id':str(user.id),
+                    'role':user.role                                   
+#Still tryna make the role aspect work
+#what I've done so far only seems to print out 
+                },status=status.HTTP_200_OK)
+            
+            token=RefreshToken(str(refresh.access_token))
+            token.blacklist()
+
+            return Response({
+                'ERROR':'iNVALID CREDENTIALS'                
+            },status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+         try:
+             refresh_token=request.data.get("refresh")
+
+             if not refresh_token:
+                 return Response({
+                     "error":"Refresh token is required"
+                 }, status=status.HTTP_400_BAD_REQUEST)
+             
+             token=RefreshToken(refresh_token)
+             token.blacklist()
+             return Response({
+                 "message":"Successfully logged out"
+             },status=status.HTTP_205_RESET_CONTENT)
+         
+         except TokenError as e:
+             return Response(
+                 {
+                     "error":"Invalid or expired token"
+                 },
+                 status=status.HTTP_400_BAD_REQUEST
+             )
+         except Exception as e:
+             return Response(
+                 {"error":"Something went wrong"},
+                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+             )
+             
+from rest_framework_role_filters.viewsets import RoleFilterModelViewSet
+
+from .models import User
+from .role_filters import AdminRoleFilter, UserRoleFilter
+from .serializers import UserSerializer
+
+
+class UserViewSet(RoleFilterModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    role_filter_classes = [AdminRoleFilter, UserRoleFilter]
+
+    def get_role_id(self, request):
+        return request.user.role.role_id
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
