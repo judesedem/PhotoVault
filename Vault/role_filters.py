@@ -1,5 +1,5 @@
 from rest_framework_role_filters.role_filters import RoleFilter
-from Auth_app.serializers import UserSerializer
+from .serializers import UserSerializer
 from rest_framework.permissions import SAFE_METHODS
 
 
