@@ -237,14 +237,14 @@ class AllUsersView(APIView):
         serializer=UserSerializer(user,many=True)
         return Response(serializer.data)
     
-from Auth_app.serializers import LoginSerializer,SignupSerializer
+from .serializers import LoginSerializer,SignupSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework.authentication import authenticate
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from Auth_app.models import User
+from .models import User
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.exceptions import TokenError
