@@ -3,6 +3,7 @@ from rest_framework.permissions import BasePermission,SAFE_METHODS
 # , while public photos can be viewed by others and may be
 #  deleted by the owner or an admin if deemed inappropriate,
 #private photos can only be viewed by admin but not changed
+#the admin has no right to delete private photos
 
 class IsOwnerorReadOnly(BasePermission):
     def has_permission(self, request, view):
